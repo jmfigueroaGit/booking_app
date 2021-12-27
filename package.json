@@ -6,9 +6,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seeder": "node utils/seeder"
+    "seeder": "node seeder"
   },
   "dependencies": {
+    "dotenv": "^10.0.0",
     "mongoose": "^6.1.3",
     "next": "12.0.7",
     "next-connect": "^0.11.0",
