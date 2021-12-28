@@ -1,4 +1,3 @@
-import room from '../models/room';
 import Room from '../models/room';
 import ErrorHandler from '../utils/errorHandler';
 import catchAsyncError from '../middlewares/catchAsyncError';
