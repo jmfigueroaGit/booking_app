@@ -5,7 +5,7 @@ import catchAsyncError from '../middlewares/catchAsyncError';
 import APIFeatures from '../utils/apiFeatures';
 
 const allRooms = catchAsyncError(async (req, res) => {
-	const resPerPage = 4;
+	const resPerPage = 2;
 	const roomsCount = await Room.countDocuments();
 
 	const apiFeature = new APIFeatures(Room.find(), req.query)

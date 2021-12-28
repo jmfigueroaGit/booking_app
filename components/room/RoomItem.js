@@ -35,7 +35,7 @@ const RoomItem = ({ room }) => {
 					</div>
 
 					<button className="btn btn-block view-btn">
-						<Link href={`/rooms/${room._id}`}>View Details</Link>
+						<Link href={`/room/${room._id}`}>View Details</Link>
 					</button>
 				</div>
 			</div>

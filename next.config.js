@@ -5,6 +5,10 @@ module.exports = {
 			'mongodb+srv://dev061417:dev061417@maindb.qmybv.mongodb.net/mainDatabase?retryWrites=true&w=majority',
 	},
 	images: {
-		domains: ['res.cloudinary.com'],
+		domains: [
+			'res.cloudinary.com',
+			'i.pinimg.com',
+			'encrypted-tbn0.gstatic.com',
+		],
 	},
 };
