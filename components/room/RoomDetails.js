@@ -1,7 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Image from 'next/image';
 import RoomFeatures from './RoomFeatures';
+
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import { Carousel } from 'react-bootstrap';
 
@@ -10,17 +14,91 @@ import { toast } from 'react-toastify';
 
 import { clearErrors } from '../../redux/actions/roomActions';
 
+import {
+	checkBooking,
+	getBookedDates,
+} from '../../redux/actions/bookingAction';
+import { CHECK_BOOKING_RESET } from '../../redux/constants/bookingConstants';
+
+import axios from 'axios';
+
 const RoomDetails = () => {
+	const [checkInDate, setCheckInDate] = useState();
+	const [checkOutDate, setCheckOutDate] = useState();
+	const [daysOfStay, setDaysOfStay] = useState();
+
 	const dispatch = useDispatch();
+	const router = useRouter();
+
+	const { id } = router.query;
 
 	const { room, error } = useSelector((state) => state.roomDetails);
+	const { user } = useSelector((state) => state.loadedUser);
+	const { dates } = useSelector((state) => state.bookedDates);
+	const { available, loading: bookingLoading } = useSelector(
+		(state) => state.checkBooking
+	);
+
+	const excludedDates = [];
+	dates.forEach((date) => {
+		excludedDates.push(new Date(date));
+	});
+
+	const onChange = (dates) => {
+		const [checkInDate, checkOutDate] = dates;
+
+		setCheckInDate(checkInDate);
+		setCheckOutDate(checkOutDate);
+
+		if (checkInDate && checkOutDate) {
+			// Calclate days of stay
+
+			const days = Math.floor(
+				(new Date(checkOutDate) - new Date(checkInDate)) / 86400000 + 1
+			);
+
+			setDaysOfStay(days);
+
+			dispatch(
+				checkBooking(id, checkInDate.toISOString(), checkOutDate.toISOString())
+			);
+		}
+	};
+
+	const newBookingHandler = async () => {
+		const bookingData = {
+			room: router.query.id,
+			checkInDate,
+			checkOutDate,
+			daysOfStay,
+			amountPaid: 90,
+			paymentInfo: {
+				id: 'STRIPE_PAYMENT_ID',
+				status: 'STRIPE_PAYMENT_STATUS',
+			},
+		};
+
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			};
+
+			const { data } = await axios.post('/api/bookings', bookingData, config);
+			console.log(data);
+		} catch (error) {
+			console.log(error.response);
+		}
+	};
 
 	useEffect(() => {
-		if (error) {
-			toast.error(error);
-			dispatch(clearErrors());
-		}
-	}, [error, dispatch]);
+		dispatch(getBookedDates(id));
+
+		toast.error(error);
+		dispatch(clearErrors());
+	}, [dispatch, id, error]);
+
 	return (
 		<>
 			<Head>
@@ -69,8 +147,48 @@ const RoomDetails = () => {
 							<p className="price-per-night">
 								<b>${room.pricePerNight}</b> / night
 							</p>
+							<hr />
 
-							<button className="btn btn-block py-3 booking-btn">Pay</button>
+							<p className="mt-5 mb-3">Pick Check In & Check Out Date</p>
+
+							<DatePicker
+								className="w-100"
+								selected={checkInDate}
+								onChange={onChange}
+								startDate={checkInDate}
+								endDate={checkOutDate}
+								minDate={new Date()}
+								excludeDates={excludedDates}
+								selectsRange
+								inline
+							/>
+
+							{available === true && user && (
+								<div className="alert alert-success my-3 font-weight-bold">
+									Room is available. Book now.
+								</div>
+							)}
+
+							{available === false && (
+								<div className="alert alert-danger my-3 font-weight-bold">
+									Room not available. Try different dates.
+								</div>
+							)}
+
+							{available && !user && (
+								<div className="alert alert-danger my-3 font-weight-bold">
+									Login to book room
+								</div>
+							)}
+
+							{available && user && (
+								<button
+									className="btn btn-block py-3 booking-btn"
+									onClick={newBookingHandler}
+								>
+									Pay
+								</button>
+							)}
 						</div>
 					</div>
 				</div>

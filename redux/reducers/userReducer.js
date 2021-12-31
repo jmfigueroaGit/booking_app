@@ -25,15 +25,33 @@ export const authReducer = (state = { user: null }, action) => {
 			return {
 				loading: true,
 			};
-		case LOAD_USER_REQUEST:
-			return {
-				loading: true,
-				isAuthenticated: false,
-			};
 		case REGISTER_USER_SUCCESS:
 			return {
 				loading: false,
 				success: true,
+			};
+		case REGISTER_USER_FAILED:
+			return { loading: false, error: action.payload };
+		case CLEAR_ERROR:
+			return {
+				...state,
+				error: null,
+			};
+		default:
+			return state;
+	}
+};
+
+// Load user reducer
+export const loadedUserReducer = (
+	state = { loading: true, user: null },
+	action
+) => {
+	switch (action.type) {
+		case LOAD_USER_REQUEST:
+			return {
+				loading: true,
+				isAuthenticated: false,
 			};
 		case LOAD_USER_SUCCESS:
 			return {
@@ -41,8 +59,6 @@ export const authReducer = (state = { user: null }, action) => {
 				isAuthenticated: true,
 				user: action.payload,
 			};
-		case REGISTER_USER_FAILED:
-			return { loading: false, error: action.payload };
 		case LOAD_USER_FAILED:
 			return { loading: false, isAuthenticated: false, error: action.payload };
 
