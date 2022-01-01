@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRouted, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 
 import { toast } from 'react-toastify';
 import ButtonLoader from '../layout/ButtonLoader';

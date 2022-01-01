@@ -2,6 +2,7 @@ import Room from '../models/room';
 import ErrorHandler from '../utils/errorHandler';
 import catchAsyncError from '../middlewares/catchAsyncError';
 import APIFeatures from '../utils/apiFeatures';
+import Booking from '../models/booking';
 
 const allRooms = catchAsyncError(async (req, res) => {
 	const resPerPage = 2;
@@ -84,4 +85,66 @@ const deleteRoom = catchAsyncError(async (req, res) => {
 	});
 });
 
-export { allRooms, newRoom, getSingleRoom, updateRoom, deleteRoom };
+// Create a new Review => /api/reviews
+const createRoomReview = catchAsyncError(async (req, res) => {
+	const { rating, comment, roomId } = req.body;
+	const review = {
+		user: req.user._id,
+		name: req.user.name,
+		rating: Number(rating),
+		comment,
+	};
+	const room = await Room.findById(roomId);
+
+	const isReviewed = room.reviews.find(
+		(r) => r.user.toString() === req.user._id.toString()
+	);
+
+	if (isReviewed) {
+		room.reviews.forEach((review) => {
+			if (review.user.toString() === req.user._id.toString()) {
+				review.comment = comment;
+				review.rating = rating;
+			}
+		});
+	} else {
+		room.reviews.push(review);
+		room.numOfReviews = room.reviews.length;
+	}
+
+	room.rating =
+		room.reviews.reduce((acc, item) => item.rating + acc, 0) /
+		room.reviews.length;
+
+	await room.save({ validateBeforeSave: false });
+
+	res.status(201).json({
+		success: true,
+		message: 'Room is deleted',
+	});
+});
+
+// Check Review availability => /api/reviews/check_review_availability
+const checkReviewAvailability = catchAsyncError(async (req, res) => {
+	const { roomId } = req.query;
+	const bookings = await Booking.find({ user: req.user._id, room: roomId });
+
+	let isReviewAvailable = false;
+	if (bookings.length > 0) {
+		isReviewAvailable = true;
+	}
+	res.status(201).json({
+		success: true,
+		isReviewAvailable,
+	});
+});
+
+export {
+	allRooms,
+	newRoom,
+	getSingleRoom,
+	updateRoom,
+	deleteRoom,
+	createRoomReview,
+	checkReviewAvailability,
+};

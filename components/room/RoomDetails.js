@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Image from 'next/image';
 import RoomFeatures from './RoomFeatures';
+import NewReview from '../review/NewReview';
 
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -21,6 +22,7 @@ import { CHECK_BOOKING_RESET } from '../../redux/constants/bookingConstants';
 
 import axios from 'axios';
 import getStripe from '../../utils/getStripe';
+import ListReview from '../review/ListReview';
 
 const RoomDetails = () => {
 	const [checkInDate, setCheckInDate] = useState();
@@ -138,7 +140,7 @@ const RoomDetails = () => {
 					<div className="rating-outer">
 						<div
 							className="rating-inner"
-							style={{ width: `${(room.ratings / 5) * 100}% ` }}
+							style={{ width: `${(room.rating / 5) * 100}%` }}
 						></div>
 					</div>
 					<span id="no_of_reviews">({room.numOfReviews} Reviews)</span>
@@ -219,30 +221,14 @@ const RoomDetails = () => {
 						</div>
 					</div>
 				</div>
-
-				<div className="reviews w-75">
-					<h3>Reviews:</h3>
-					<hr />
-					<div className="review-card my-3">
-						<div className="rating-outer">
-							<div className="rating-inner"></div>
-						</div>
-						<p className="review_user">by John</p>
-						<p className="review_comment">Good Quality</p>
-
-						<hr />
-					</div>
-
-					<div className="review-card my-3">
-						<div className="rating-outer">
-							<div className="rating-inner"></div>
-						</div>
-						<p className="review_user">by John</p>
-						<p className="review_comment">Good Quality</p>
-
-						<hr />
-					</div>
-				</div>
+				<NewReview />
+				{room.reviews && room.reviews.length > 0 ? (
+					<ListReview reviews={room.reviews} />
+				) : (
+					<p>
+						<b>No Reviews on this room</b>
+					</p>
+				)}
 			</div>
 		</>
 	);
