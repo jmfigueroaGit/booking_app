@@ -8,19 +8,22 @@ import Loader from '../layout/Loader';
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { getAdminRooms, deleteRoom } from '../../redux/actions/roomActions';
+import {
+	getAdminUsers,
+	deleteUser,
+	clearErrors,
+} from '../../redux/actions/userActions';
+import { DELETE_USER_RESET } from '../../redux/constants/userConstants';
 
-import { clearErrors } from '../../redux/actions/bookingAction';
-import { DELETE_ROOM_RESET } from '../../redux/constants/roomConstants';
-const AllRooms = () => {
+const AllUsers = () => {
 	const dispatch = useDispatch();
 	const router = useRouter();
 
-	const { loading, error, rooms } = useSelector((state) => state.allRooms);
-	const { error: deleteError, isDeleted } = useSelector((state) => state.room);
+	const { loading, error, users } = useSelector((state) => state.allUsers);
+	const { error: deleteError, isDeleted } = useSelector((state) => state.user);
 
 	useEffect(() => {
-		dispatch(getAdminRooms());
+		dispatch(getAdminUsers());
 		if (error) {
 			toast.error(error);
 			dispatch(clearErrors());
@@ -32,16 +35,16 @@ const AllRooms = () => {
 		}
 
 		if (isDeleted) {
-			router.push('/admin/rooms');
-			dispatch({ type: DELETE_ROOM_RESET });
+			router.push('/admin/users/');
+			dispatch({ type: DELETE_USER_RESET });
 		}
 	}, [dispatch, error, deleteError, isDeleted, router]);
 
-	const setRooms = () => {
+	const setUsers = () => {
 		const data = {
 			columns: [
 				{
-					label: 'Room ID',
+					label: 'User ID',
 					field: 'id',
 					sort: 'asc',
 				},
@@ -51,13 +54,13 @@ const AllRooms = () => {
 					sort: 'asc',
 				},
 				{
-					label: 'Price Per Night',
-					field: 'price',
+					label: 'Email',
+					field: 'email',
 					sort: 'asc',
 				},
 				{
-					label: 'Category',
-					field: 'category',
+					label: 'Role',
+					field: 'role',
 					sort: 'asc',
 				},
 				{
@@ -69,23 +72,23 @@ const AllRooms = () => {
 			rows: [],
 		};
 
-		rooms &&
-			rooms.forEach((room) => {
+		users &&
+			users.forEach((user) => {
 				data.rows.push({
-					id: room._id,
-					name: room.name,
-					price: room.pricePerNight,
-					category: room.category,
+					id: user._id,
+					name: user.name,
+					email: user.email,
+					role: user.role,
 					actions: (
 						<>
-							<Link href={`/admin/rooms/${room._id}`}>
+							<Link href={`/admin/users/${user._id}`}>
 								<a className="btn btn-primary">
 									<i className="fa fa-pencil"></i>
 								</a>
 							</Link>
 							<button
 								className="btn btn-danger mx-2"
-								onClick={() => deleteRoomHandler(room._id)}
+								onClick={() => deleteRoomHandler(user._id)}
 							>
 								<i className="fa fa-trash"></i>
 							</button>
@@ -98,7 +101,7 @@ const AllRooms = () => {
 	};
 
 	const deleteRoomHandler = (id) => {
-		dispatch(deleteRoom(id));
+		dispatch(deleteUser(id));
 	};
 
 	return (
@@ -107,17 +110,10 @@ const AllRooms = () => {
 				<Loader />
 			) : (
 				<>
-					<h1 className="my-5">
-						{`${rooms && rooms.length} Rooms`}
-						<Link href="/admin/rooms/new">
-							<a className="mt-0 btn text-white float-right new-room-btn">
-								Create Room
-							</a>
-						</Link>
-					</h1>
+					<h1 className="my-5">{`${users && users.length} Users`}</h1>
 
 					<MDBDataTable
-						data={setRooms()}
+						data={setUsers()}
 						className="px-3"
 						bordered
 						striped
@@ -129,4 +125,4 @@ const AllRooms = () => {
 	);
 };
 
-export default AllRooms;
+export default AllUsers;

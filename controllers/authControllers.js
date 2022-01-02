@@ -168,10 +168,79 @@ const resetPassword = catchAsyncError(async (req, res, next) => {
 	});
 });
 
+// Get All Users   =>   /api/admin/users
+const allAdminUsers = catchAsyncError(async (req, res) => {
+	const users = await User.find();
+
+	res.status(200).json({
+		success: true,
+		users,
+	});
+});
+
+// Get User's Details  =>   /api/admin/users/:id
+const getUserDetails = catchAsyncError(async (req, res) => {
+	const user = await User.findById(req.query.id);
+
+	if (!user) {
+		return next(new ErrorHandler('User not found with this ID', 404));
+	}
+
+	res.status(200).json({
+		success: true,
+		user,
+	});
+});
+
+// Update User's Details  =>   /api/admin/users/:id
+const updateUser = catchAsyncError(async (req, res) => {
+	const newUserData = {
+		name: req.body.name,
+		email: req.body.email,
+		role: req.body.role,
+	};
+
+	const user = await User.findByIdAndUpdate(req.query.id, newUserData, {
+		new: true,
+		runValidators: true,
+		useFindAndModify: false,
+	});
+
+	res.status(200).json({
+		success: true,
+		user,
+	});
+});
+
+// Delete User's Details  =>   /api/admin/users/:id
+const deleteUser = catchAsyncError(async (req, res, next) => {
+	const user = await User.findById(req.query.id);
+
+	if (!user) {
+		return next(new ErrorHandler('User not found with this ID', 404));
+	}
+
+	// Remove avatar
+	const image_id = user.avatar.public_id;
+
+	await cloudinary.v2.uploader.destroy(image_id);
+
+	await user.remove();
+
+	res.status(200).json({
+		success: true,
+		user,
+	});
+});
+
 export {
 	registerUser,
 	currentUserProfile,
 	updateProfile,
 	forgotPassword,
 	resetPassword,
+	allAdminUsers,
+	getUserDetails,
+	updateUser,
+	deleteUser,
 };
