@@ -33,11 +33,15 @@ const roomSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
+	petsAllowed: {
+		type: Boolean,
+		default: false,
+	},
 	breakfast: {
 		type: Boolean,
 		default: false,
 	},
-	airCondition: {
+	airConditioned: {
 		type: Boolean,
 		default: false,
 	},
