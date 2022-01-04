@@ -26,13 +26,12 @@ const RoomReviews = () => {
 	);
 
 	useEffect(() => {
-		if (error) {
-			toast.error(error);
-			dispatch(clearErrors());
-		}
-
 		if (roomId !== '') {
 			dispatch(getRoomReviews(roomId));
+			if (error) {
+				toast.error(error);
+				dispatch(clearErrors());
+			}
 		}
 
 		if (deleteError) {

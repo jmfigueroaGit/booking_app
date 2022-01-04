@@ -26,19 +26,21 @@ const Profile = () => {
 		'/images/default_avatar.jpg'
 	);
 
-	const { user: loadedUser, loading } = useSelector((state) => state.auth);
+	const { user: loadedUser, loading } = useSelector(
+		(state) => state.loadedUser
+	);
 	const {
 		error,
 		isUpdate,
 		loading: updateLoading,
 	} = useSelector((state) => state.user);
-
 	useEffect(() => {
 		if (loadedUser) {
 			setUser({
 				name: loadedUser.name,
 				email: loadedUser.email,
 			});
+
 			setAvatarPreview(loadedUser.avatar.url);
 		}
 

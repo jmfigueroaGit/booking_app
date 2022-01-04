@@ -12,6 +12,7 @@ const RoomItem = ({ room }) => {
 					height={180}
 					width={280}
 					alt="photo"
+					priority
 				/>
 				<div className="card-body d-flex flex-column">
 					<h5 className="card-title">
@@ -28,7 +29,7 @@ const RoomItem = ({ room }) => {
 						<div className="rating-outer">
 							<div
 								className="rating-inner"
-								style={{ width: `${(room.ratings / 5) * 100}% ` }}
+								style={{ width: `${(room.rating / 5) * 100}% ` }}
 							></div>
 						</div>
 						<span id="no_of_reviews">({room.numOfReviews} Reviews)</span>
